@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container": "#1d2027", "surface-container-high": "#272a31",
+          "surface-container-low": "#191b23", "outline-variant": "#424754",
+          "on-surface": "#e1e2ec", "on-surface-variant": "#c2c6d6",
+          "background": "#10131a", "primary": "#adc6ff", "on-primary": "#002e6a",
+          "error": "#ffb4ab", "tertiary": "#ffb786",
+          "primary-container": "#4d8eff", "on-primary-container": "#00285d"
+        }
+      }
+    }
+  }
+</script>
+<style>
+  /*
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   * REF: §5.4 기업 상세 — 캐릭터 시트
+   * SKILLS VERSION: Skills_ui.md v4.4.1
+   *
+   * ✅ 티어 컬러 Skills §12 기준 (원본과 대체로 일치, 미세 보정)
+   *   S: #22C55E → Overall S 표시용 tertiary(#ffb786) 유지 (원본 디자인 의도)
+   *   A: #60A5FA (primary color 그대로)
+   *   B: #F59E0B
+   *   C: #EF4444 (error color)
+   * ✅ 데모 모드 배너 추가
+   * ✅ 면책 표시 §11 추가
+   * ⚠️  {변수} 값은 demo.db 런타임 조회로 대체 필수
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   */
+  body { background-color: #10131a; color: #e1e2ec; font-family: 'Work Sans', sans-serif; }
+  .hud-border { border: 1px solid #334155; }
+  .corner-accent { position: relative; }
+  .corner-accent::before {
+    content: ''; position: absolute; top: -1px; left: -1px;
+    width: 8px; height: 8px; border-top: 2px solid #3B82F6; border-left: 2px solid #3B82F6;
+  }
+  .corner-accent::after {
+    content: ''; position: absolute; bottom: -1px; right: -1px;
+    width: 8px; height: 8px; border-bottom: 2px solid #3B82F6; border-right: 2px solid #3B82F6;
+  }
+  /* Skills §12 티어 컬러 */
+  .tier-s-color  { color: #22C55E; }
+  .tier-a-color  { color: #60A5FA; }
+  .tier-b-color  { color: #F59E0B; }
+  .tier-c-color  { color: #EF4444; }
+  /* 6대 코어 스탯 축 컬러 (Skills §12) */
+  .bar-profitability { background-color: #3B82F6; }
+  .bar-growth        { background-color: #10B981; }
+  .bar-stability     { background-color: #F59E0B; }
+  .bar-efficiency    { background-color: #8B5CF6; }
+  .bar-valuation     { background-color: #EC4899; }
+  .bar-cash          { background-color: #06B6D4; }
+  .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
+</style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+
+<!-- Top Navigation -->
+<header class="fixed top-0 left-0 w-full h-14 z-50 flex items-center justify-between px-4 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+  <div class="flex items-center gap-8">
+    <div class="text-lg font-black tracking-widest text-blue-500 uppercase">EQUITY HUB</div>
+    <nav class="hidden md:flex gap-6">
+      <a class="text-blue-500 font-bold text-sm uppercase" href="#">Dashboard</a>
+      <a class="text-slate-400 hover:text-blue-400 transition-colors text-sm uppercase" href="#">Market Intelligence</a>
+      <a class="text-slate-400 hover:text-blue-400 transition-colors text-sm uppercase" href="#">Portfolio</a>
+    </nav>
+  </div>
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-blue-500">notifications</span>
+    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
+      <span class="material-symbols-outlined text-slate-400 text-sm">person</span>
+    </div>
+  </div>
+</header>
+
+<!-- Side Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col pt-16 pb-4 z-40 bg-slate-950 border-r border-slate-800 w-64 hidden md:flex">
+  <div class="px-4 mb-8">
+    <div class="text-blue-500 font-black text-sm tracking-widest">EQUITY HUB</div>
+    <div class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Command Center</div>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a class="bg-slate-900 text-blue-500 border-r-2 border-blue-500 flex items-center px-4 py-3 gap-3" href="#">
+      <span class="material-symbols-outlined text-sm">category</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">섹터 허브</span></a>
+    <a class="text-slate-500 flex items-center px-4 py-3 gap-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined text-sm">group_work</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">포트폴리오 스쿼드</span></a>
+    <a class="text-slate-500 flex items-center px-4 py-3 gap-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined text-sm">insights</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">마켓 인텔</span></a>
+    <a class="text-slate-500 flex items-center px-4 py-3 gap-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined text-sm">school</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">아카데미</span></a>
+  </nav>
+  <div class="mt-auto space-y-1">
+    <a class="text-slate-500 flex items-center px-4 py-3 gap-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined text-sm">settings</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">Settings</span></a>
+  </div>
+</aside>
+
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-14 pb-12 px-6">
+
+  <!-- ✅ 데모 모드 배너 (Skills §0) -->
+  <div class="w-full bg-slate-900/70 border-b border-amber-500/30 px-2 py-2 flex items-center justify-between mb-4">
+    <span class="text-[11px] font-bold text-amber-300 uppercase tracking-widest">
+      📅 데이터 기준: {price_date} &nbsp;|&nbsp; 출처: SEC EDGAR
+    </span>
+    <span class="text-[10px] font-bold text-amber-400/70 uppercase tracking-widest">데모 버전 — 실시간 데이터가 아닙니다</span>
+  </div>
+
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Character Header Section -->
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+      <!-- Profile Identity -->
+      <div class="md:col-span-8 bg-surface-container border border-outline-variant p-6 flex flex-col justify-between corner-accent glass-panel">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <!-- {섹터명} 런타임 조회 -->
+              <span class="bg-blue-600 px-2 py-0.5 text-[10px] font-bold tracking-tighter uppercase">{sector_label}</span>
+              <!-- {cik} 런타임 조회 -->
+              <span class="text-slate-500 font-mono text-xs tracking-widest">UID: {cik}</span>
+            </div>
+            <!-- {company_name} 런타임 조회 -->
+            <h1 class="text-4xl font-bold leading-none mb-1">{company_name}</h1>
+            <div class="flex items-center gap-4">
+              <!-- {ticker} 런타임 조회 -->
+              <span class="text-2xl font-bold text-primary">{ticker}</span>
+              <span class="material-symbols-outlined text-slate-500">verified</span>
+              <div class="h-4 w-px bg-slate-700"></div>
+              <!-- {exchange} | {gics_industry} 런타임 조회 -->
+              <span class="text-xs text-slate-400 uppercase font-bold tracking-widest">{exchange} | {gics_industry}</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-slate-500 text-[10px] uppercase font-bold mb-1">1Y Return</div>
+            <!-- {price_change_1y} 런타임 조회 (prices 테이블) -->
+            <div class="text-emerald-400 text-2xl font-bold">{price_change_1y}% <span class="text-xs font-normal">(1Y)</span></div>
+          </div>
+        </div>
+        <div class="mt-8 flex gap-8 items-end">
+          <div class="flex-1">
+            <div class="text-slate-500 text-[10px] uppercase font-bold mb-2">Power Level</div>
+            <!-- {total_score} / 100 런타임 조회 -->
+            <div class="w-full bg-slate-800 h-1">
+              <div class="bg-primary h-full shadow-[0_0_8px_rgba(173,198,255,0.6)]" style="width:{total_score}%"></div>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="text-center">
+              <div class="text-slate-500 text-[10px] uppercase font-bold">Market Cap</div>
+              <!-- {market_cap} 런타임 조회 -->
+              <div class="font-mono text-sm">{market_cap}</div>
+            </div>
+            <div class="text-center">
+              <div class="text-slate-500 text-[10px] uppercase font-bold">P/E Ratio</div>
+              <!-- {per} 런타임 조회 -->
+              <div class="font-mono text-sm">{per}x</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overall Tier Badge -->
+      <div class="md:col-span-4 bg-surface-container border border-outline-variant p-6 flex flex-col items-center justify-center relative overflow-hidden glass-panel">
+        <div class="absolute inset-0 opacity-10 pointer-events-none bg-gradient-to-br from-blue-900 to-transparent"></div>
+        <div class="z-10 text-center">
+          <div class="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4">Overall Performance Tier</div>
+          <div class="relative inline-block mb-4">
+            <!--
+              {overall_tier} 런타임 조회: scores 테이블
+              S이면 tertiary(#ffb786), A이면 primary(#adc6ff) 등 Skills §12 적용
+            -->
+            <div class="text-[120px] font-black leading-none text-tertiary italic">{overall_tier}</div>
+            <div class="absolute -top-2 -right-4 bg-primary text-on-primary font-bold px-2 py-1 text-sm italic">TIER</div>
+          </div>
+          <div class="flex items-center justify-center gap-2">
+            <!-- {total_score} 런타임 조회 -->
+            <div class="text-4xl font-bold font-mono text-primary">{total_score}</div>
+            <div class="text-left">
+              <div class="text-[10px] text-slate-500 uppercase font-bold leading-none">Composite</div>
+              <div class="text-[10px] text-slate-500 uppercase font-bold leading-none">Score</div>
+            </div>
+          </div>
+          <!-- {sector_percentile} 런타임 조회 -->
+          <p class="text-[10px] text-slate-400 mt-2">섹터 내 상위 {sector_percentile}%</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Stat Profile -->
+    <section class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <!-- 6대 코어 스탯 바 -->
+      <div class="md:col-span-7 bg-surface-container border border-outline-variant p-8 glass-panel corner-accent">
+        <div class="flex justify-between items-center mb-8">
+          <h3 class="text-xl font-semibold text-on-surface uppercase tracking-tight">Core Stat Profile</h3>
+          <div class="flex gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            <span class="w-2 h-2 rounded-full bg-slate-700"></span>
+            <span class="w-2 h-2 rounded-full bg-slate-700"></span>
+          </div>
+        </div>
+        <!--
+          각 스탯: tiers 테이블에서 tier_profitability 등 조회
+          바 width = TIER_SCORE 매핑: S=100, A=75, B=50, C=25
+          클릭 → §5.5 지표 설명 팝업 (indicator_popup.html)
+        -->
+        <div class="grid grid-cols-2 gap-x-12 gap-y-8">
+          <!-- 수익성: #3B82F6 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">수익성</span>
+              <!-- {tier_profitability_score}: S=100/A=75/B=50/C=25 -->
+              <span class="font-mono text-primary">{tier_profitability_score}</span>
+            </div>
+            <div class="h-2 bg-slate-800 relative">
+              <div class="absolute top-0 left-0 h-full bar-profitability" style="width:{tier_profitability_score}%"></div>
+              <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-4 bar-profitability"></div>
+            </div>
+            <!-- {tier_profitability} 티어 라벨 -->
+            <div class="text-[10px] mt-1 tier-s-color font-bold">[{tier_profitability}] OPM {opm}% ROE {roe}%</div>
+          </div>
+          <!-- 성장성: #10B981 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">성장성</span>
+              <span class="font-mono text-primary">{tier_growth_score}</span>
+            </div>
+            <div class="h-2 bg-slate-800 relative">
+              <div class="absolute top-0 left-0 h-full bar-growth" style="width:{tier_growth_score}%"></div>
+              <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-4 bar-growth"></div>
+            </div>
+            <div class="text-[10px] mt-1 tier-a-color font-bold">[{tier_growth}] 매출YoY {rev_yoy}%</div>
+          </div>
+          <!-- 안정성: #F59E0B -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">안정성</span>
+              <span class="font-mono text-primary">{tier_stability_score}</span>
+            </div>
+            <div class="h-2 bg-slate-800 relative">
+              <div class="absolute top-0 left-0 h-full bar-stability" style="width:{tier_stability_score}%"></div>
+              <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-4 bar-stability"></div>
+            </div>
+            <div class="text-[10px] mt-1 tier-b-color font-bold">[{tier_stability}] DR {dr}% ICR {icr}x</div>
+          </div>
+          <!-- 효율성: #8B5CF6 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">효율성</span>
+              <span class="font-mono text-primary">{tier_efficiency_score}</span>
+            </div>
+            <div class="h-2 bg-slate-800 relative">
+              <div class="absolute top-0 left-0 h-full bar-efficiency" style="width:{tier_efficiency_score}%"></div>
+              <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-4 bar-efficiency"></div>
+            </div>
+            <div class="text-[10px] mt-1 tier-a-color font-bold">[{tier_efficiency}] 자산회전 {asset_turn}</div>
+          </div>
+          <!-- 밸류에이션: #EC4899 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">밸류에이션</span>
+              <span class="font-mono text-primary">{tier_valuation_score}</span>
+            </div>
+            <div class="h-2 bg-slate-800 relative">
+              <div class="absolute top-0 left-0 h-full bar-valuation" style="width:{tier_valuation_score}%"></div>
+              <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-4 bar-valuation"></div>
+            </div>
+            <div class="text-[10px] mt-1 tier-b-color font-bold">[{tier_valuation}] PER {per}x EV/EBITDA {ev_ebitda}x</div>
+          </div>
+          <!-- 현금창출력: #06B6D4 -->
+          <div>
+            <div class="flex justify-between items-end mb-2">
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">현금창출력</span>
+              <span class="font-mono text-error">{tier_cash_score}</span>
+            </div>
+            <div class="h-2 bg-slate-800 relative">
+              <div class="absolute top-0 left-0 h-full bar-cash" style="width:{tier_cash_score}%"></div>
+              <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-1 h-4 bar-cash"></div>
+            </div>
+            <div class="text-[10px] mt-1 tier-c-color font-bold">[{tier_cash_power}] FCF Margin {fcf_margin}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategic Insights -->
+      <div class="md:col-span-5 flex flex-col gap-6">
+        <div class="bg-surface-container border border-outline-variant p-6 flex-1 glass-panel">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm">bolt</span>
+            <h4 class="text-[10px] text-on-surface uppercase font-bold tracking-widest">Strategic Insights</h4>
+          </div>
+          <!-- {insight_1~3}: Skills §7.2~7.3 자동 생성 -->
+          <ul class="space-y-4">
+            <li class="flex gap-4">
+              <div class="mt-1 w-1.5 h-1.5 bg-primary flex-shrink-0"></div>
+              <div>
+                <div class="text-sm font-bold text-on-surface mb-1 uppercase tracking-tighter">{insight_title_1}</div>
+                <p class="text-on-surface-variant text-[13px] leading-relaxed">{insight_body_1}</p>
+              </div>
+            </li>
+            <li class="flex gap-4">
+              <div class="mt-1 w-1.5 h-1.5 bg-primary flex-shrink-0"></div>
+              <div>
+                <div class="text-sm font-bold text-on-surface mb-1 uppercase tracking-tighter">{insight_title_2}</div>
+                <p class="text-on-surface-variant text-[13px] leading-relaxed">{insight_body_2}</p>
+              </div>
+            </li>
+            <li class="flex gap-4">
+              <div class="mt-1 w-1.5 h-1.5 bg-primary flex-shrink-0"></div>
+              <div>
+                <div class="text-sm font-bold text-on-surface mb-1 uppercase tracking-tighter">{insight_title_3}</div>
+                <p class="text-on-surface-variant text-[13px] leading-relaxed">{insight_body_3}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- 교육 목적 강조 배너 -->
+        <div class="bg-blue-600/10 border border-blue-500/50 p-6 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-blue-400 uppercase font-bold tracking-widest mb-1">교육 목적</div>
+            <div class="text-xl font-bold text-on-primary-container">투자 추천이 아닙니다</div>
+          </div>
+          <button class="bg-primary text-on-primary px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-colors">상세 분석 보기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPI 4개 하단 바 -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- {rev_yoy}, {opm}, {roe}, {net_cash}: 런타임 조회 -->
+      <div class="bg-surface-container-low border border-outline-variant px-4 py-3 flex items-center justify-between">
+        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">매출 성장 YoY</span>
+        <span class="font-mono text-emerald-400">{rev_yoy}%</span>
+      </div>
+      <div class="bg-surface-container-low border border-outline-variant px-4 py-3 flex items-center justify-between">
+        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">영업이익률</span>
+        <span class="font-mono text-emerald-400">{opm}%</span>
+      </div>
+      <div class="bg-surface-container-low border border-outline-variant px-4 py-3 flex items-center justify-between">
+        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">ROE</span>
+        <span class="font-mono text-emerald-400">{roe}%</span>
+      </div>
+      <div class="bg-surface-container-low border border-outline-variant px-4 py-3 flex items-center justify-between">
+        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">순현금</span>
+        <span class="font-mono text-on-surface">{net_cash}</span>
+      </div>
+    </section>
+
+    <!-- ✅ 면책 표시 (Skills §11) -->
+    <footer class="pt-6 border-t border-slate-800">
+      <p class="text-sm text-slate-500 leading-relaxed">
+        <span class="font-bold text-slate-400">⚠️ DISCLAIMER:</span>
+        본 대시보드는 교육 목적으로 제작되었습니다. 투자 추천·매수·매도 의견이 아닙니다.
+        재무 데이터: SEC EDGAR | 데이터 기준: {fiscal_year}년 10-K | 주가 기준일: {price_date}
+        | 벤치마크: demo.db 실측 분위수 ({n}개사) | 실제 투자 전 반드시 전문가 상담을 권장합니다.
+      </p>
+    </footer>
+
+  </div>
+</main>
+
+<!-- Navigation Mobile Fallback -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-slate-950 border-t border-slate-800 h-16 flex items-center justify-around z-50">
+  <button class="flex flex-col items-center gap-1 text-blue-500">
+    <span class="material-symbols-outlined">category</span>
+    <span class="text-[10px] uppercase font-bold">Hub</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500">
+    <span class="material-symbols-outlined">insights</span>
+    <span class="text-[10px] uppercase font-bold">Stats</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500">
+    <span class="material-symbols-outlined">group_work</span>
+    <span class="text-[10px] uppercase font-bold">Squad</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500">
+    <span class="material-symbols-outlined">person</span>
+    <span class="text-[10px] uppercase font-bold">Profile</span>
+  </button>
+</nav>
+
+<!-- HUD Footer -->
+<footer class="fixed bottom-0 left-0 w-full h-8 bg-slate-950 border-t border-slate-800 hidden md:flex items-center px-4 justify-between z-40">
+  <div class="flex gap-4 items-center">
+    <div class="flex items-center gap-2">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">System Online: DEMO MODE</span>
+    </div>
+    <div class="h-3 w-px bg-slate-800"></div>
+    <!-- ⚠️ 데모 고정값 -->
+    <div class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Last Index Update: {price_date}</div>
+  </div>
+  <div class="flex gap-6 font-mono text-[10px] text-slate-400">
+    <!-- ⚠️ 데모 고정값 -->
+    <span>{ticker}: ${stock_price} <span class="text-emerald-400">{price_change_pct}%</span></span>
+  </div>
+</footer>
+
+</body>
+</html>

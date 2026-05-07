@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body { @apply bg-slate-950 text-slate-200; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-slate-900; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded-full; }
+}
+
+@layer components {
+  /* HUD corner decoration */
+  .hud-corner { position: relative; }
+  .hud-corner::before,
+  .hud-corner::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+  }
+  .hud-corner::before { top: 0; left: 0; border-top: 2px solid #3B82F6; border-left: 2px solid #3B82F6; }
+  .hud-corner::after  { bottom: 0; right: 0; border-bottom: 2px solid #3B82F6; border-right: 2px solid #3B82F6; }
+
+  /* Stat bar fill colors (§12) */
+  .bar-profitability { background-color: #3B82F6; }
+  .bar-growth        { background-color: #10B981; }
+  .bar-stability     { background-color: #F59E0B; }
+  .bar-efficiency    { background-color: #8B5CF6; }
+  .bar-valuation     { background-color: #EC4899; }
+  .bar-cash_power    { background-color: #06B6D4; }
+
+  /* Card base */
+  .card { @apply bg-slate-900 border border-slate-800 rounded-lg; }
+
+  /* HUD marquee */
+  @keyframes marquee {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-marquee { animation: marquee 30s linear infinite; }
+}

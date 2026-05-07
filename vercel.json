@@ -1,0 +1,21 @@
+{
+  "buildCommand": "pip install -r backend/requirements.txt && python -m backend.db.init_db && python -m backend.services.seed_demo && python -m backend.services.recompute_tiers && cd frontend && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "cd frontend && npm install",
+  "rewrites": [
+    { "source": "/api/health",  "destination": "/data/health.json" },
+    { "source": "/api/sectors", "destination": "/data/sectors.json" },
+    {
+      "source": "/api/sector/:name",
+      "has": [{ "type": "query", "key": "tab", "value": "compare" }],
+      "destination": "/data/sector/:name.compare.json"
+    },
+    {
+      "source": "/api/sector/:name",
+      "destination": "/data/sector/:name.understand.json"
+    },
+    { "source": "/api/company/:ticker",          "destination": "/data/company/:ticker.json" },
+    { "source": "/api/indicator/:ticker/:name",  "destination": "/data/indicator/:ticker/:name.json" },
+    { "source": "/((?!api|data|assets|.*\\..*).*)", "destination": "/index.html" }
+  ]
+}

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container": "#1d2027", "surface-container-high": "#272a31",
+          "surface-container-low": "#191b23", "outline-variant": "#424754",
+          "on-surface": "#e1e2ec", "on-surface-variant": "#c2c6d6",
+          "background": "#10131a", "primary": "#adc6ff", "on-primary": "#002e6a",
+          "tertiary": "#ffb786", "surface": "#10131a", "surface-dim": "#10131a"
+        },
+        fontFamily: {
+          "display": ["Work Sans"], "h1": ["Work Sans"], "h2": ["Work Sans"],
+          "h3": ["Work Sans"], "body-lg": ["Work Sans"], "body-md": ["Work Sans"],
+          "body-sm": ["Work Sans"], "label-caps": ["Work Sans"], "mono-data": ["Work Sans"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  /*
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   * REF: §5.3 탭1 섹터 스탯 보드 — 섹터 이해하기
+   * SKILLS VERSION: Skills_ui.md v4.4.1
+   *
+   * ✅ 티어 컬러 Skills §12 기준 적용
+   * ✅ 데모 모드 배너 추가
+   * ✅ 벤치마크 출처 표시 추가 (원본 없음)
+   * ✅ 면책 표시 §11 추가
+   * ⚠️  {변수} 값은 demo.db 런타임 조회로 대체 필수
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   */
+  body { font-family: 'Work Sans', sans-serif; background-color: #10131a; color: #e1e2ec; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .corner-accent { position: relative; }
+  .corner-accent::before {
+    content: ''; position: absolute; top: -1px; left: -1px;
+    width: 8px; height: 8px; border-top: 2px solid #3B82F6; border-left: 2px solid #3B82F6;
+  }
+  /* Skills §12 티어 컬러 */
+  .tier-s { color: #22C55E; }
+  .tier-a { color: #60A5FA; }
+  .tier-b { color: #F59E0B; }
+  .tier-c { color: #EF4444; }
+  .tier-badge-s { color: #22C55E; border: 1px solid #22C55E; }
+  .tier-badge-a { color: #60A5FA; border: 1px solid #60A5FA; }
+  .tier-badge-b { color: #F59E0B; border: 1px solid #F59E0B; }
+  .tier-badge-c { color: #EF4444; border: 1px solid #EF4444; }
+  /* 6대 코어 스탯 축 컬러 (Skills §12) */
+  .stat-profitability { color: #3B82F6; border-color: #3B82F6; }
+  .stat-growth       { color: #10B981; border-color: #10B981; }
+  .stat-stability    { color: #F59E0B; border-color: #F59E0B; }
+  .stat-efficiency   { color: #8B5CF6; border-color: #8B5CF6; }
+  .stat-valuation    { color: #EC4899; border-color: #EC4899; }
+  .stat-cash         { color: #06B6D4; border-color: #06B6D4; }
+</style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full h-14 z-50 flex items-center justify-between px-4 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+  <div class="flex items-center gap-4">
+    <span class="text-lg font-black tracking-widest text-blue-500 uppercase">EQUITY HUB</span>
+    <div class="hidden md:flex items-center gap-6 ml-8">
+      <span class="text-sm text-blue-500 font-bold cursor-pointer">섹터 허브</span>
+      <span class="text-sm text-slate-400 hover:text-blue-400 transition-colors px-2 py-1 cursor-pointer">포트폴리오 스쿼드</span>
+      <span class="text-sm text-slate-400 hover:text-blue-400 transition-colors px-2 py-1 cursor-pointer">마켓 인텔</span>
+      <span class="text-sm text-slate-400 hover:text-blue-400 transition-colors px-2 py-1 cursor-pointer">아카데미</span>
+    </div>
+  </div>
+  <div class="flex items-center gap-3">
+    <div class="material-symbols-outlined text-slate-400 hover:text-blue-500 cursor-pointer">notifications</div>
+    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
+      <span class="material-symbols-outlined text-slate-400 text-sm">person</span>
+    </div>
+  </div>
+</header>
+
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col pt-16 pb-4 z-40 bg-slate-950 border-r border-slate-800 w-64 hidden lg:flex">
+  <div class="px-4 mb-8">
+    <h2 class="text-blue-500 font-black text-xl tracking-tighter">EQUITY HUB</h2>
+    <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">COMMAND CENTER</p>
+  </div>
+  <div class="flex-1 space-y-1">
+    <div class="bg-slate-900 text-blue-500 border-r-2 border-blue-500 flex items-center px-4 py-3 cursor-pointer">
+      <span class="material-symbols-outlined mr-3">category</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">섹터 허브</span>
+    </div>
+    <div class="text-slate-500 flex items-center px-4 py-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all cursor-pointer">
+      <span class="material-symbols-outlined mr-3">group_work</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">포트폴리오 스쿼드</span>
+    </div>
+    <div class="text-slate-500 flex items-center px-4 py-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all cursor-pointer">
+      <span class="material-symbols-outlined mr-3">insights</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">마켓 인텔</span>
+    </div>
+    <div class="text-slate-500 flex items-center px-4 py-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all cursor-pointer">
+      <span class="material-symbols-outlined mr-3">school</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">아카데미</span>
+    </div>
+  </div>
+  <div class="mt-auto space-y-1">
+    <div class="text-slate-500 flex items-center px-4 py-3 hover:bg-slate-900/50 hover:text-slate-200 transition-all cursor-pointer">
+      <span class="material-symbols-outlined mr-3">settings</span>
+      <span class="uppercase text-[11px] font-bold tracking-wider">Settings</span>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Canvas -->
+<main class="lg:pl-64 pt-14 min-h-screen bg-background">
+
+  <!-- ✅ 데모 모드 배너 (Skills §0) -->
+  <div class="w-full bg-slate-900/70 border-b border-amber-500/30 px-6 py-2 flex items-center justify-between">
+    <span class="text-[11px] font-bold text-amber-300 uppercase tracking-widest">
+      📅 데이터 기준: {price_date} &nbsp;|&nbsp; 출처: SEC EDGAR
+    </span>
+    <span class="text-[10px] font-bold text-amber-400/70 uppercase tracking-widest">데모 버전 — 실시간 데이터가 아닙니다</span>
+  </div>
+
+  <div class="p-6 md:p-8 max-w-[1600px] mx-auto">
+
+    <!-- Sector Summary Header -->
+    <section class="mb-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-blue-600 text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">Sector Focus</span>
+            <span class="text-slate-500 text-sm font-mono">Analysis Updated: {price_date}</span>
+          </div>
+          <!-- {섹터명} 런타임 조회 -->
+          <h1 class="text-4xl font-bold text-on-background leading-none mb-2 uppercase">{섹터명} SECTOR</h1>
+          <!-- {sector_intro} Skills §6.4에서 자동 선택 -->
+          <p class="text-on-surface-variant text-lg max-w-2xl">{sector_intro}</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="p-4 border border-outline-variant bg-surface-container-low flex items-center gap-4 corner-accent">
+            <div class="text-right">
+              <p class="text-[10px] text-slate-500 uppercase font-bold">Sector Rating</p>
+              <!-- {sector_tier} 런타임 계산: 섹터 평균 total_score → 티어 변환 -->
+              <p class="text-3xl font-black text-blue-500 leading-none">{sector_tier}-Tier</p>
+            </div>
+            <div class="w-10 h-10 rounded-full border-2 border-blue-500 flex items-center justify-center">
+              <span class="material-symbols-outlined text-blue-500" style="font-variation-settings:'FILL' 1">star</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 섹터 평균 스탯 카드 (6대 코어 스탯) -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <!-- 수익성 -->
+      <div class="bg-surface-container border border-outline-variant p-4 flex flex-col justify-between hover:border-blue-500 transition-colors">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined stat-profitability bg-blue-500/10 p-2">payments</span>
+          <!-- {tier_profitability} 런타임 조회 -->
+          <span class="text-[10px] font-bold px-2 py-0.5 border tier-badge-s">{tier_profitability}</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">수익성 · OPM 평균</p>
+          <!-- {avg_opm} 런타임 조회 -->
+          <h3 class="text-2xl font-mono font-bold text-on-background mb-1">{avg_opm}%</h3>
+          <!-- ✅ 벤치마크 출처 표시 (Skills §0) -->
+          <p class="text-[10px] text-slate-500">섹터 중앙값 {p50_opm}% <span class="text-amber-400">({source})</span></p>
+          <div class="w-full bg-slate-800 h-1 mt-2"><div class="bg-blue-500 h-full" style="width:{opm_pct}%"></div></div>
+        </div>
+      </div>
+      <!-- 성장성 -->
+      <div class="bg-surface-container border border-outline-variant p-4 flex flex-col justify-between hover:border-blue-500 transition-colors">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined stat-growth bg-emerald-500/10 p-2">trending_up</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 border tier-badge-a">{tier_growth}</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">성장성 · 매출YoY 평균</p>
+          <h3 class="text-2xl font-mono font-bold text-on-background mb-1">{avg_rev_yoy}%</h3>
+          <p class="text-[10px] text-slate-500">섹터 중앙값 {p50_rev_yoy}% <span class="text-amber-400">({source})</span></p>
+          <div class="w-full bg-slate-800 h-1 mt-2"><div class="bg-emerald-500 h-full" style="width:{rev_yoy_pct}%"></div></div>
+        </div>
+      </div>
+      <!-- 안정성 -->
+      <div class="bg-surface-container border border-outline-variant p-4 flex flex-col justify-between hover:border-blue-500 transition-colors">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined stat-stability bg-amber-500/10 p-2">shield</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 border tier-badge-b">{tier_stability}</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">안정성 · DR 평균</p>
+          <h3 class="text-2xl font-mono font-bold text-on-background mb-1">{avg_dr}%</h3>
+          <p class="text-[10px] text-slate-500">섹터 중앙값 {p50_dr}% <span class="text-amber-400">({source})</span></p>
+          <div class="w-full bg-slate-800 h-1 mt-2"><div class="bg-amber-500 h-full" style="width:{dr_pct}%"></div></div>
+        </div>
+      </div>
+      <!-- 효율성 -->
+      <div class="bg-surface-container border border-outline-variant p-4 flex flex-col justify-between hover:border-blue-500 transition-colors">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined stat-efficiency bg-purple-500/10 p-2">bolt</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 border tier-badge-a">{tier_efficiency}</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">효율성 · 자산회전율</p>
+          <h3 class="text-2xl font-mono font-bold text-on-background mb-1">{avg_asset_turn}</h3>
+          <p class="text-[10px] text-slate-500">섹터 중앙값 {p50_asset_turn} <span class="text-amber-400">({source})</span></p>
+          <div class="w-full bg-slate-800 h-1 mt-2"><div class="bg-purple-500 h-full" style="width:{asset_turn_pct}%"></div></div>
+        </div>
+      </div>
+      <!-- 밸류에이션 -->
+      <div class="bg-surface-container border border-outline-variant p-4 flex flex-col justify-between hover:border-blue-500 transition-colors">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined stat-valuation bg-pink-500/10 p-2">query_stats</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 border tier-badge-b">{tier_valuation}</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">밸류에이션 · PER 평균</p>
+          <h3 class="text-2xl font-mono font-bold text-on-background mb-1">{avg_per}x</h3>
+          <p class="text-[10px] text-slate-500">섹터 중앙값 {p50_per}x <span class="text-amber-400">({source})</span></p>
+          <div class="w-full bg-slate-800 h-1 mt-2"><div class="bg-pink-500 h-full" style="width:{per_pct}%"></div></div>
+        </div>
+      </div>
+      <!-- 현금창출력 -->
+      <div class="bg-surface-container border border-outline-variant p-4 flex flex-col justify-between hover:border-blue-500 transition-colors">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined stat-cash bg-cyan-500/10 p-2">water_drop</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 border tier-badge-s">{tier_cash_power}</span>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 mb-1 uppercase font-bold tracking-widest">현금창출력 · FCF Margin</p>
+          <h3 class="text-2xl font-mono font-bold text-on-background mb-1">{avg_fcf_margin}%</h3>
+          <p class="text-[10px] text-slate-500">섹터 중앙값 {p50_fcf_margin}% <span class="text-amber-400">({source})</span></p>
+          <div class="w-full bg-slate-800 h-1 mt-2"><div class="bg-cyan-500 h-full" style="width:{fcf_margin_pct}%"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: 섹터 이해하기 -->
+    <section>
+      <div class="mb-6 flex items-center gap-3">
+        <div class="h-px bg-slate-800 flex-1"></div>
+        <!-- {key_indicator_1~3}: Skills §6.2 섹터별 핵심 지표 3개에서 자동 선택 -->
+        <h4 class="text-[10px] text-blue-500 tracking-[0.2em] font-black uppercase">이 섹터에서 특히 중요한 지표 3개</h4>
+        <div class="h-px bg-slate-800 flex-1"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- 지표 1 -->
+        <div class="bg-surface-container-low border-l-4 border-l-blue-500 p-6 relative overflow-hidden">
+          <div class="absolute top-[-10%] right-[-5%] opacity-[0.03] scale-150">
+            <span class="material-symbols-outlined text-[120px]">account_balance</span>
+          </div>
+          <h5 class="text-xl font-semibold text-on-background mb-3 flex items-center gap-2">
+            <span class="text-blue-500 font-black">01</span> {key_indicator_1}
+          </h5>
+          <!-- {indicator_1_definition}: Skills §6.1 자동 선택 -->
+          <p class="text-sm text-on-surface-variant leading-relaxed mb-3">{indicator_1_definition}</p>
+          <!-- {sector_x_indicator_1_reason}: Skills §6.3 자동 선택 -->
+          <p class="text-sm text-on-surface-variant leading-relaxed mb-4 italic">{sector_x_indicator_1_reason}</p>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5">섹터 핵심 지표</span>
+            <!-- ✅ 벤치마크 출처: 섹터 정상 범위 표시 시 source 함께 표시 -->
+            <span class="text-[10px] text-slate-500">정상 범위 {lo_1}~{hi_1} ({source})</span>
+          </div>
+        </div>
+        <!-- 지표 2 -->
+        <div class="bg-surface-container-low border-l-4 border-l-blue-500 p-6 relative overflow-hidden">
+          <div class="absolute top-[-10%] right-[-5%] opacity-[0.03] scale-150">
+            <span class="material-symbols-outlined text-[120px]">account_balance_wallet</span>
+          </div>
+          <h5 class="text-xl font-semibold text-on-background mb-3 flex items-center gap-2">
+            <span class="text-blue-500 font-black">02</span> {key_indicator_2}
+          </h5>
+          <p class="text-sm text-on-surface-variant leading-relaxed mb-3">{indicator_2_definition}</p>
+          <p class="text-sm text-on-surface-variant leading-relaxed mb-4 italic">{sector_x_indicator_2_reason}</p>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5">섹터 핵심 지표</span>
+            <span class="text-[10px] text-slate-500">정상 범위 {lo_2}~{hi_2} ({source})</span>
+          </div>
+        </div>
+        <!-- 지표 3 -->
+        <div class="bg-surface-container-low border-l-4 border-l-blue-500 p-6 relative overflow-hidden">
+          <div class="absolute top-[-10%] right-[-5%] opacity-[0.03] scale-150">
+            <span class="material-symbols-outlined text-[120px]">rocket_launch</span>
+          </div>
+          <h5 class="text-xl font-semibold text-on-background mb-3 flex items-center gap-2">
+            <span class="text-blue-500 font-black">03</span> {key_indicator_3}
+          </h5>
+          <p class="text-sm text-on-surface-variant leading-relaxed mb-3">{indicator_3_definition}</p>
+          <p class="text-sm text-on-surface-variant leading-relaxed mb-4 italic">{sector_x_indicator_3_reason}</p>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5">섹터 핵심 지표</span>
+            <span class="text-[10px] text-slate-500">정상 범위 {lo_3}~{hi_3} ({source})</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 현재 섹터 상태 (티어 분포) -->
+      <div class="bg-surface-container border border-outline-variant p-6 mb-6">
+        <h4 class="text-sm font-bold text-on-surface uppercase tracking-widest mb-4">현재 이 섹터는 어떤 상태인가요?</h4>
+        <div class="flex gap-6 mb-4">
+          <!-- {n_s/n_a/n_b/n_c} 런타임 조회 -->
+          <div class="flex items-center gap-2"><span class="text-sm font-bold tier-s">[S티어]</span><span class="text-sm text-slate-400">{n_s}개</span></div>
+          <div class="flex items-center gap-2"><span class="text-sm font-bold tier-a">[A티어]</span><span class="text-sm text-slate-400">{n_a}개</span></div>
+          <div class="flex items-center gap-2"><span class="text-sm font-bold tier-b">[B티어]</span><span class="text-sm text-slate-400">{n_b}개</span></div>
+          <div class="flex items-center gap-2"><span class="text-sm font-bold tier-c">[C티어]</span><span class="text-sm text-slate-400">{n_c}개</span></div>
+        </div>
+        <!-- 티어 비율 바 시각화 -->
+        <div class="flex h-3 w-full gap-0.5 mb-4">
+          <div class="bg-emerald-500" style="width:{s_pct}%" title="S티어"></div>
+          <div class="bg-blue-400" style="width:{a_pct}%" title="A티어"></div>
+          <div class="bg-amber-500" style="width:{b_pct}%" title="B티어"></div>
+          <div class="bg-red-500" style="width:{c_pct}%" title="C티어"></div>
+        </div>
+        <!-- {auto_sector_insight}: Skills §7.1 자동 생성 -->
+        <div class="bg-blue-500/5 border border-blue-500/20 p-4">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-blue-400 text-sm mt-0.5">lightbulb</span>
+            <p class="text-sm text-blue-100">{auto_sector_insight} → 종목별 상세는 [종목 비교 →] 탭에서 확인하세요.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 전환 버튼 -->
+      <div class="flex gap-2">
+        <button class="bg-blue-600 text-white px-6 py-2 text-[11px] font-bold uppercase tracking-wider">섹터 이해하기</button>
+        <button class="bg-slate-900 border border-slate-700 text-slate-400 px-6 py-2 text-[11px] font-bold uppercase tracking-wider hover:border-blue-500 transition-colors">종목 비교 →</button>
+      </div>
+    </section>
+
+    <!-- HUD 장식 -->
+    <div class="mt-8 pt-6 border-t border-slate-800 flex justify-between items-center opacity-50">
+      <div class="flex gap-6">
+        <span class="text-[9px] font-mono tracking-widest text-slate-500">SYS_ID: {섹터명}_001</span>
+        <span class="text-[9px] font-mono tracking-widest text-slate-500">CORE_INTEL: ACTIVE</span>
+      </div>
+      <div class="flex gap-1">
+        <div class="w-1 h-1 bg-blue-500"></div>
+        <div class="w-1 h-1 bg-blue-500/50"></div>
+        <div class="w-1 h-1 bg-blue-500/20"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ 면책 표시 (Skills §11) -->
+  <footer class="mt-8 py-8 px-6 border-t border-slate-800 bg-slate-950/50">
+    <p class="text-sm text-slate-500 leading-relaxed max-w-4xl">
+      <span class="font-bold text-slate-400">⚠️ DISCLAIMER:</span>
+      본 대시보드는 교육 목적으로 제작되었습니다. 투자 추천·매수·매도 의견이 아닙니다.
+      재무 데이터 출처: SEC EDGAR (data.sec.gov) | 데이터 기준: {fiscal_year}년 10-K
+      | 벤치마크 출처: demo.db 실측 분위수 ({n}개사, {fiscal_year}년 기준)
+      | 본 서비스는 데모 버전으로 실시간 데이터를 제공하지 않습니다.
+    </p>
+  </footer>
+
+</main>
+
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-slate-950 border-t border-slate-800 flex justify-around items-center h-16 px-4 z-50">
+  <div class="flex flex-col items-center text-blue-500">
+    <span class="material-symbols-outlined">category</span>
+    <span class="text-[10px] font-bold">섹터</span>
+  </div>
+  <div class="flex flex-col items-center text-slate-500">
+    <span class="material-symbols-outlined">group_work</span>
+    <span class="text-[10px] font-bold">포트</span>
+  </div>
+  <div class="flex flex-col items-center text-slate-500">
+    <span class="material-symbols-outlined">insights</span>
+    <span class="text-[10px] font-bold">인텔</span>
+  </div>
+  <div class="flex flex-col items-center text-slate-500">
+    <span class="material-symbols-outlined">school</span>
+    <span class="text-[10px] font-bold">스쿨</span>
+  </div>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# DB
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE
+.vscode/
+.idea/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+backend/demo.db
+
+# Static API build output (regenerated on every build)
+frontend/public/data/

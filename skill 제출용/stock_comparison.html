@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@100..900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container": "#1d2027", "surface-container-high": "#272a31",
+          "surface-container-low": "#191b23", "outline-variant": "#424754",
+          "on-surface": "#e1e2ec", "on-surface-variant": "#c2c6d6",
+          "background": "#10131a", "primary": "#adc6ff", "tertiary": "#ffb786"
+        },
+        fontSize: {
+          "label-caps": ["12px", {lineHeight:"16px", letterSpacing:"0.1em", fontWeight:"600"}],
+          "mono-data": ["14px", {lineHeight:"20px", letterSpacing:"-0.01em", fontWeight:"500"}],
+          "h1": ["32px", {lineHeight:"40px", letterSpacing:"-0.01em", fontWeight:"600"}],
+          "h3": ["20px", {lineHeight:"28px", fontWeight:"600"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  /*
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   * REF: §5.3 탭2 종목 비교
+   * SKILLS VERSION: Skills_ui.md v4.4.1
+   *
+   * ✅ 티어 컬러 Skills §12 기준 적용 (원본에서 S/A 반전 → 수정)
+   *   S: #22C55E  (원본: text-blue-500 → emerald 보정)
+   *   A: #60A5FA  (원본: text-emerald-500 → blue 보정)
+   *   B: #F59E0B  (원본 일치)
+   *   C: #EF4444  (원본 일치)
+   * ✅ 데모 모드 배너 추가
+   * ✅ 면책 표시 §11 추가
+   * ⚠️  {변수} 값은 demo.db 런타임 조회로 대체 필수
+   * ⚠️  HUD Ticker Footer: 데모 고정값 처리
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   */
+  body { font-family: 'Work Sans', sans-serif; background-color: #10131a; color: #e1e2ec; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  /* ── Skills §12 티어 컬러 (완전 수정본) ── */
+  .tier-s { color: #22C55E; border: 1px solid #22C55E; }  /* 원본 blue → emerald */
+  .tier-a { color: #60A5FA; border: 1px solid #60A5FA; }  /* 원본 emerald → blue  */
+  .tier-b { color: #F59E0B; border: 1px solid #F59E0B; }  /* 원본 일치 */
+  .tier-c { color: #EF4444; border: 1px solid #EF4444; }  /* 원본 일치 */
+
+  .corner-accent { position: absolute; width: 8px; height: 8px; border-color: #3b82f6; }
+  .corner-tl { top:0; left:0; border-top-width:2px; border-left-width:2px; }
+  .corner-tr { top:0; right:0; border-top-width:2px; border-right-width:2px; }
+  .corner-bl { bottom:0; left:0; border-bottom-width:2px; border-left-width:2px; }
+  .corner-br { bottom:0; right:0; border-bottom-width:2px; border-right-width:2px; }
+
+  @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .animate-marquee { display:inline-flex; animation:marquee 30s linear infinite; }
+</style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full h-14 z-50 flex items-center justify-between px-4 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+  <div class="flex items-center gap-6">
+    <span class="text-lg font-black tracking-widest text-blue-500 uppercase">EQUITY HUB</span>
+    <nav class="hidden md:flex items-center gap-4">
+      <a class="text-blue-500 font-bold text-sm" href="#">섹터 허브</a>
+      <a class="text-slate-400 text-sm hover:text-blue-400 transition-colors px-2 py-1" href="#">포트폴리오 스쿼드</a>
+      <a class="text-slate-400 text-sm hover:text-blue-400 transition-colors px-2 py-1" href="#">마켓 인텔</a>
+      <a class="text-slate-400 text-sm hover:text-blue-400 transition-colors px-2 py-1" href="#">아카데미</a>
+    </nav>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="relative flex items-center bg-slate-900 border border-slate-800 px-3 py-1">
+      <span class="material-symbols-outlined text-slate-500 text-sm mr-2">search</span>
+      <input class="bg-transparent border-none focus:ring-0 text-[11px] font-mono text-slate-300 w-48 uppercase" placeholder="SEARCH TICKER..." type="text"/>
+    </div>
+    <button class="text-slate-400 hover:text-blue-500 transition-colors">
+      <span class="material-symbols-outlined">notifications</span>
+    </button>
+    <div class="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center border border-slate-700">
+      <span class="material-symbols-outlined text-slate-400 text-sm">person</span>
+    </div>
+  </div>
+</header>
+
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col pt-16 pb-4 z-40 bg-slate-950 border-r border-slate-800 w-64 hidden lg:flex">
+  <div class="px-6 mb-8">
+    <h2 class="text-blue-500 font-black text-xs tracking-[0.2em] mb-1">EQUITY HUB</h2>
+    <p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">COMMAND CENTER</p>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a class="text-slate-500 flex items-center px-4 py-3 uppercase text-[11px] font-bold tracking-wider hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined mr-3">category</span>섹터 허브</a>
+    <a class="bg-slate-900 text-blue-500 border-r-2 border-blue-500 flex items-center px-4 py-3 uppercase text-[11px] font-bold tracking-wider" href="#">
+      <span class="material-symbols-outlined mr-3">group_work</span>포트폴리오 스쿼드</a>
+    <a class="text-slate-500 flex items-center px-4 py-3 uppercase text-[11px] font-bold tracking-wider hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined mr-3">insights</span>마켓 인텔</a>
+    <a class="text-slate-500 flex items-center px-4 py-3 uppercase text-[11px] font-bold tracking-wider hover:bg-slate-900/50 hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined mr-3">school</span>아카데미</a>
+  </nav>
+  <div class="px-4 pt-4 border-t border-slate-800 space-y-1">
+    <a class="text-slate-500 flex items-center px-4 py-2 uppercase text-[10px] font-bold tracking-wider hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined text-sm mr-3">settings</span>Settings</a>
+    <a class="text-slate-500 flex items-center px-4 py-2 uppercase text-[10px] font-bold tracking-wider hover:text-slate-200 transition-all" href="#">
+      <span class="material-symbols-outlined text-sm mr-3">help</span>Support</a>
+  </div>
+</aside>
+
+<!-- Main Canvas -->
+<main class="ml-0 lg:ml-64 pt-14 min-h-screen">
+
+  <!-- ✅ 데모 모드 배너 (Skills §0) -->
+  <div class="w-full bg-slate-900/70 border-b border-amber-500/30 px-6 py-2 flex items-center justify-between">
+    <span class="text-[11px] font-bold text-amber-300 uppercase tracking-widest">
+      📅 데이터 기준: {price_date} &nbsp;|&nbsp; 출처: SEC EDGAR
+    </span>
+    <span class="text-[10px] font-bold text-amber-400/70 uppercase tracking-widest">데모 버전 — 실시간 데이터가 아닙니다</span>
+  </div>
+
+  <div class="px-6 pt-6 pb-20">
+    <!-- Header -->
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <!-- {섹터명} 런타임 조회 -->
+          <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 uppercase">{섹터명} SECTOR</span>
+          <span class="text-slate-500 text-[10px] font-mono tracking-widest uppercase">MARKET SCAN // {fiscal_year}.Q{quarter}</span>
+        </div>
+        <h1 class="text-h1 text-on-background flex items-center gap-3 uppercase">
+          종목 비교분석 <span class="text-slate-600 font-light">STOCK COMPARISON</span>
+        </h1>
+      </div>
+      <div class="flex gap-2">
+        <button class="bg-slate-900 border border-slate-700 px-4 py-2 text-[11px] font-bold tracking-wider hover:border-blue-500 transition-colors uppercase">Export Data</button>
+        <button class="bg-blue-600 border border-blue-500 px-4 py-2 text-[11px] font-bold tracking-wider hover:bg-blue-500 transition-all uppercase">Live Sync On</button>
+      </div>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-12 gap-6">
+
+      <!-- 히트맵 테이블 (시총 상위 10~20종목) -->
+      <div class="col-span-12 lg:col-span-9">
+        <div class="relative bg-surface-container border border-outline-variant p-1">
+          <div class="corner-accent corner-tl"></div>
+          <div class="corner-accent corner-tr"></div>
+          <div class="corner-accent corner-bl"></div>
+          <div class="corner-accent corner-br"></div>
+          <div class="bg-slate-950 p-4 border border-slate-800">
+            <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-3">
+              <h3 class="text-label-caps text-on-surface uppercase flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-500 text-lg">grid_view</span>
+                시총 상위 {n}종목 — 6대 스탯 히트맵
+              </h3>
+              <!-- ✅ 수정된 범례: Skills §12 기준 -->
+              <div class="flex gap-4">
+                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500"></div><span class="text-[10px] text-slate-500 font-bold">S (상위10%)</span></div>
+                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-400"></div><span class="text-[10px] text-slate-500 font-bold">A (상위35%)</span></div>
+                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-amber-500"></div><span class="text-[10px] text-slate-500 font-bold">B (평균)</span></div>
+                <div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-red-500"></div><span class="text-[10px] text-slate-500 font-bold">C (하위35%)</span></div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-800 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <th class="py-3 px-2">Ticker</th>
+                    <!-- 6대 코어 스탯 — Skills §5.3 탭2 히트맵 -->
+                    <th class="py-3 px-2 text-center" style="color:#3B82F6">수익성</th>
+                    <th class="py-3 px-2 text-center" style="color:#10B981">성장성</th>
+                    <th class="py-3 px-2 text-center" style="color:#F59E0B">안정성</th>
+                    <th class="py-3 px-2 text-center" style="color:#8B5CF6">효율성</th>
+                    <th class="py-3 px-2 text-center" style="color:#EC4899">밸류에이션</th>
+                    <th class="py-3 px-2 text-center" style="color:#06B6D4">현금창출</th>
+                  </tr>
+                </thead>
+                <tbody class="font-mono text-xs">
+                  <!--
+                    {ticker_n}: 시총 상위 종목 런타임 조회
+                    각 셀: tiers 테이블에서 tier_profitability/growth/stability/efficiency/valuation/cash_power 조회
+                  -->
+                  <tr class="border-b border-slate-900 hover:bg-slate-900 transition-colors">
+                    <td class="py-4 px-2 font-black text-blue-400">{ticker_1}</td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t1_p}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{t1_g}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t1_s}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-b">{t1_e}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{t1_v}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{t1_c}</span></td>
+                  </tr>
+                  <tr class="border-b border-slate-900 hover:bg-slate-900 transition-colors">
+                    <td class="py-4 px-2 font-black text-blue-400">{ticker_2}</td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t2_p}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t2_g}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{t2_s}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-c">{t2_e}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-b">{t2_v}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{t2_c}</span></td>
+                  </tr>
+                  <tr class="border-b border-slate-900 hover:bg-slate-900 transition-colors">
+                    <td class="py-4 px-2 font-black text-blue-400">{ticker_3}</td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t3_p}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t3_g}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-s">{t3_s}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-c">{t3_e}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-c">{t3_v}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-b">{t3_c}</span></td>
+                  </tr>
+                  <!-- 섹터 평균 행 -->
+                  <tr class="hover:bg-slate-900 transition-colors border-t border-blue-500/20">
+                    <td class="py-4 px-2 font-black text-slate-400 text-[10px] uppercase">섹터평균</td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{avg_p}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{avg_g}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-b">{avg_s}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-b">{avg_e}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-b">{avg_v}</span></td>
+                    <td class="py-4 px-2 text-center"><span class="px-2 py-1 rounded-sm tier-a">{avg_c}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3Y CAGR 랭킹 TOP 3 -->
+      <div class="col-span-12 lg:col-span-3">
+        <div class="bg-surface-container border border-outline-variant p-1 h-full">
+          <div class="bg-slate-950 p-4 border border-slate-800 h-full">
+            <h3 class="text-label-caps text-on-surface uppercase mb-6 flex items-center gap-2">
+              <span class="material-symbols-outlined text-tertiary text-lg">trending_up</span>
+              <!-- Skills §5.3 탭2: 3Y CAGR 랭킹 -->
+              매출 3Y CAGR TOP 3
+            </h3>
+            <div class="space-y-4">
+              <!-- {ticker_rank_1}: 런타임 조회 -->
+              <div class="relative cursor-pointer overflow-hidden border border-slate-800 bg-slate-900/50 p-4">
+                <div class="absolute top-0 right-0 p-2 opacity-20 text-4xl font-black italic">01</div>
+                <div class="relative z-10">
+                  <div class="text-[10px] font-bold text-blue-500 uppercase tracking-tighter mb-1">{industry_1}</div>
+                  <div class="text-xl font-bold mb-1">{ticker_rank_1}</div>
+                  <div class="flex items-end gap-2">
+                    <span class="text-2xl font-black text-tertiary">{cagr_1}%</span>
+                    <span class="text-[10px] text-slate-500 font-bold mb-1">3Y CAGR</span>
+                  </div>
+                </div>
+                <div class="mt-4 h-1 bg-slate-800 w-full overflow-hidden">
+                  <div class="h-full bg-tertiary" style="width:{cagr_1_bar}%"></div>
+                </div>
+              </div>
+              <div class="relative cursor-pointer overflow-hidden border border-slate-800 bg-slate-900/50 p-4">
+                <div class="absolute top-0 right-0 p-2 opacity-20 text-4xl font-black italic">02</div>
+                <div class="relative z-10">
+                  <div class="text-[10px] font-bold text-blue-500 uppercase tracking-tighter mb-1">{industry_2}</div>
+                  <div class="text-xl font-bold mb-1">{ticker_rank_2}</div>
+                  <div class="flex items-end gap-2">
+                    <span class="text-2xl font-black text-tertiary">{cagr_2}%</span>
+                    <span class="text-[10px] text-slate-500 font-bold mb-1">3Y CAGR</span>
+                  </div>
+                </div>
+                <div class="mt-4 h-1 bg-slate-800 w-full overflow-hidden">
+                  <div class="h-full bg-tertiary" style="width:{cagr_2_bar}%"></div>
+                </div>
+              </div>
+              <div class="relative cursor-pointer overflow-hidden border border-slate-800 bg-slate-900/50 p-4">
+                <div class="absolute top-0 right-0 p-2 opacity-20 text-4xl font-black italic">03</div>
+                <div class="relative z-10">
+                  <div class="text-[10px] font-bold text-blue-500 uppercase tracking-tighter mb-1">{industry_3}</div>
+                  <div class="text-xl font-bold mb-1">{ticker_rank_3}</div>
+                  <div class="flex items-end gap-2">
+                    <span class="text-2xl font-black text-tertiary">{cagr_3}%</span>
+                    <span class="text-[10px] text-slate-500 font-bold mb-1">3Y CAGR</span>
+                  </div>
+                </div>
+                <div class="mt-4 h-1 bg-slate-800 w-full overflow-hidden">
+                  <div class="h-full bg-tertiary" style="width:{cagr_3_bar}%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-800">
+              <p class="text-[10px] text-slate-500 font-mono leading-relaxed">
+                * {fiscal_year-3}~{fiscal_year} 회계연도 10-K 기준. demo.db 실측 데이터.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROE × PER 산점도 (Skills §5.3 탭2 [B]) -->
+      <div class="col-span-12">
+        <div class="bg-surface-container border border-outline-variant p-1">
+          <div class="bg-slate-950 p-6 border border-slate-800">
+            <div class="flex items-center justify-between mb-8">
+              <h3 class="text-label-caps text-on-surface uppercase flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-500 text-lg">bubble_chart</span>
+                가격 대비 수익성 — ROE × PER 산점도
+              </h3>
+              <div class="flex items-center gap-6 text-[10px] font-bold text-slate-500 uppercase">
+                <div class="flex items-center gap-2"><span class="text-emerald-500">💎</span> 고ROE·저PER (관심후보)</div>
+                <div class="flex items-center gap-2"><span class="text-blue-400">🚀</span> 프리미엄 성장</div>
+                <div class="flex items-center gap-2"><span class="text-amber-500">⚠️</span> 가치함정 주의</div>
+                <div class="flex items-center gap-2"><span class="text-red-500">🔴</span> 고평가 주의</div>
+              </div>
+            </div>
+            <div class="relative h-[400px] border-l-2 border-b-2 border-slate-700 ml-12 mb-12">
+              <div class="absolute -bottom-8 left-0 w-full flex justify-between px-2 text-[10px] font-mono text-slate-500">
+                <span>0x PER</span><span>20x</span><span>40x</span><span>60x</span><span>80x</span><span>100x+</span>
+              </div>
+              <div class="absolute -bottom-14 left-1/2 -translate-x-1/2 text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em]">Price to Earnings (PER)</div>
+              <div class="absolute -left-12 bottom-0 h-full flex flex-col-reverse justify-between py-2 text-[10px] font-mono text-slate-500">
+                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%+</span>
+              </div>
+              <div class="absolute -left-20 top-1/2 -translate-y-1/2 -rotate-90 text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em]">Return on Equity (ROE)</div>
+              <!-- 그리드 -->
+              <div class="absolute inset-0 grid grid-cols-5 grid-rows-4 opacity-10 pointer-events-none">
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-r border-t border-slate-400"></div><div class="border-r border-t border-slate-400"></div>
+                <div class="border-t border-slate-400"></div>
+              </div>
+              <!--
+                데이터 포인트: 런타임에 roe/per 값으로 position 계산
+                x% = per / 100 * 100, y% = roe / 100 * 100 (bottom 기준)
+              -->
+              <div class="absolute group" style="bottom:80%; left:30%">
+                <div class="w-4 h-4 bg-blue-400 rounded-full border-2 border-slate-950 animate-pulse"></div>
+                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                  {ticker_1} (ROE {roe_1}%, PER {per_1}x)
+                </div>
+                <span class="absolute top-5 left-1/2 -translate-x-1/2 text-[10px] font-black text-blue-400">{ticker_1}</span>
+              </div>
+              <div class="absolute group" style="bottom:90%; left:70%">
+                <div class="w-5 h-5 bg-tertiary rounded-full border-2 border-slate-950"></div>
+                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                  {ticker_2} (ROE {roe_2}%, PER {per_2}x)
+                </div>
+                <span class="absolute top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-blue-400">{ticker_2}</span>
+              </div>
+              <div class="absolute group" style="bottom:60%; left:15%">
+                <div class="w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-950"></div>
+                <span class="absolute top-5 left-1/2 -translate-x-1/2 text-[10px] font-black text-emerald-400">{ticker_3}</span>
+              </div>
+              <div class="absolute top-4 right-4 text-[9px] font-black text-slate-700 tracking-widest uppercase">High Growth / Premium</div>
+              <div class="absolute bottom-4 left-4 text-[9px] font-black text-slate-700 tracking-widest uppercase">Value / Recovery</div>
+            </div>
+            <!-- {auto_sector_company_insight}: Skills §7.1 자동 생성 -->
+            <div class="mt-16 bg-blue-500/5 border border-blue-500/20 p-4">
+              <p class="text-sm text-blue-100">💡 {auto_sector_company_insight}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ 면책 표시 (Skills §11) -->
+  <footer class="py-8 px-6 border-t border-slate-800 bg-slate-950/50">
+    <p class="text-sm text-slate-500 leading-relaxed max-w-4xl">
+      <span class="font-bold text-slate-400">⚠️ DISCLAIMER:</span>
+      본 대시보드는 교육 목적으로 제작되었습니다. 투자 추천이 아닙니다.
+      재무 데이터: SEC EDGAR | 데이터 기준: {fiscal_year}년 10-K | 주가 기준일: {price_date}
+      | 벤치마크: demo.db 실측 분위수 ({n}개사)
+    </p>
+  </footer>
+
+  <!-- ⚠️ HUD Ticker Footer: 데모 고정값 처리 -->
+  <div class="bg-slate-950 border-t border-slate-800 p-2 overflow-hidden whitespace-nowrap">
+    <div class="flex items-center gap-12 animate-marquee">
+      <div class="flex items-center gap-4">
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">DEMO DATA</span>
+        <span class="text-[11px] font-mono text-emerald-400 font-bold">NAS100 +1.24%</span>
+        <span class="text-[11px] font-mono text-emerald-400 font-bold">SOXX +2.05%</span>
+        <span class="text-[11px] font-mono text-red-400 font-bold">VIX -3.12%</span>
+        <span class="text-[11px] font-mono text-blue-400 font-bold">USD/KRW 1,324.50</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">TOP MOVERS (DEMO)</span>
+        <span class="text-[11px] font-mono text-emerald-400 font-bold">NVDA +4.5%</span>
+        <span class="text-[11px] font-mono text-emerald-400 font-bold">AMD +3.8%</span>
+        <span class="text-[11px] font-mono text-red-400 font-bold">INTC -1.2%</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "IT": {
+    "intro": "IT는 소프트웨어·반도체·하드웨어를 아우르며 미국 증시 시가총액의 상당 부분을 차지합니다. 무형자산 비중이 높고 R&D 투자가 미래 매출을 좌우합니다.",
+    "key_indicators": ["roe", "fcf_margin", "rev_yoy"]
+  },
+  "금융": {
+    "intro": "은행·보험·자산운용으로 구성됩니다. 자기자본 효율(ROE)과 부채 관리(DR)가 핵심이며, 금리 사이클에 민감합니다.",
+    "key_indicators": ["roe", "dr", "pbr"]
+  },
+  "헬스케어": {
+    "intro": "제약·의료기기·의료서비스가 포함됩니다. 신약 파이프라인과 규제 환경이 변동성을 결정합니다.",
+    "key_indicators": ["opm", "rev_yoy", "fcf_margin"]
+  },
+  "경기소비재": {
+    "intro": "자동차·여행·외식·소매 등 경기에 따라 수요가 변하는 업종입니다. 매출 성장과 마진 안정성이 핵심입니다.",
+    "key_indicators": ["rev_yoy", "opm", "asset_turn"]
+  },
+  "필수소비재": {
+    "intro": "식음료·생활용품·대형 마트 등 경기 둔감 업종입니다. 안정적 현금흐름과 배당이 강점입니다.",
+    "key_indicators": ["fcf_margin", "opm", "div_yield"]
+  },
+  "에너지": {
+    "intro": "원유·가스 탐사 생산과 정유가 중심입니다. 유가 사이클에 따라 실적 변동이 큽니다.",
+    "key_indicators": ["fcf_margin", "dr", "ev_ebitda"]
+  },
+  "산업재": {
+    "intro": "항공우주·기계·물류·방산을 포함합니다. 자본집약 산업으로 자산회전과 수주잔고가 중요합니다.",
+    "key_indicators": ["asset_turn", "opm", "icr"]
+  },
+  "유틸리티": {
+    "intro": "전력·가스·수도 등 규제 사업입니다. 안정적 수익이 보장되는 대신 부채 비중이 높습니다.",
+    "key_indicators": ["dr", "div_yield", "icr"]
+  },
+  "소재": {
+    "intro": "화학·금속·건자재가 포함되며 산업 사이클에 민감합니다. 원자재 가격이 마진을 결정합니다.",
+    "key_indicators": ["opm", "rev_yoy", "ev_ebitda"]
+  },
+  "커뮤니케이션": {
+    "intro": "통신·미디어·인터넷 플랫폼이 혼재합니다. 가입자·광고 매출과 콘텐츠 투자 효율이 핵심입니다.",
+    "key_indicators": ["rev_yoy", "opm", "fcf_margin"]
+  },
+  "부동산": {
+    "intro": "리츠가 대부분이며 임대료 기반 안정 수익이 강점입니다. 금리에 민감하고 배당이 매력적입니다.",
+    "key_indicators": ["fcf_margin", "dr", "div_yield"]
+  }
+}
