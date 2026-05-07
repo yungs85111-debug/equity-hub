@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "=== [1/5] Python 가상환경 생성 ==="
-uv venv .venv
+echo "=== [1/5] Python 가상환경 생성 (Python 3.12) ==="
+uv venv .venv --python 3.12
 
 echo "=== [2/5] Python 패키지 설치 ==="
 uv pip install -r backend/requirements.txt
