@@ -10,30 +10,98 @@ STAT_LABEL_KO = {
     "cash_power":    "현금창출력",
 }
 
+# 핵심 지표 한국어 전체 명칭
+_METRIC_LABEL: dict[str, str] = {
+    "roe":         "자기자본수익률(ROE)",
+    "opm":         "영업이익률(OPM)",
+    "fcf_margin":  "잉여현금흐름마진(FCF Margin)",
+    "rev_yoy":     "연간 매출성장률(Rev YoY)",
+    "rev_3y_cagr": "3년 매출 CAGR",
+    "dr":          "부채비율(DR)",
+    "icr":         "이자보상배율(ICR)",
+    "asset_turn":  "자산회전율(Asset Turnover)",
+    "per":         "주가수익비율(PER)",
+    "ev_ebitda":   "EV/EBITDA",
+    "pbr":         "주가순자산비율(PBR)",
+    "div_yield":   "배당수익률(Dividend Yield)",
+}
+
+# 지표 단위 (표시용)
+_METRIC_UNIT: dict[str, str] = {
+    "roe":         "%",
+    "opm":         "%",
+    "fcf_margin":  "%",
+    "rev_yoy":     "%",
+    "rev_3y_cagr": "%",
+    "dr":          "%",
+    "icr":         "x",
+    "asset_turn":  "x",
+    "per":         "x",
+    "ev_ebitda":   "x",
+    "pbr":         "x",
+    "div_yield":   "%",
+}
+
 
 # ── §7.1 섹터 인사이트 ────────────────────────────────────────────────────────
-def sector_insight(tier_dist: dict, key_stat: str, avg_value: float | None) -> str:
+def sector_insight(
+    tier_dist: dict,
+    key_stat: str,
+    avg_value: float | None,
+    narrative: str = "",
+    key_metric_context: dict | None = None,
+) -> str:
     """
-    tier_dist: {s_pct, a_pct, b_pct, c_pct}
-    key_stat:  dominant stat label (e.g. 'roe', 'fcf_margin')
-    avg_value: sector average for key_stat
+    tier_dist:         {s_pct, a_pct, b_pct, c_pct}
+    key_stat:          primary metric name (e.g. 'roe', 'fcf_margin')
+    avg_value:         sector average for key_stat
+    narrative:         sector-specific 1-2 sentence description (from sector_definitions.json)
+    key_metric_context: {metric_name: explanation_str} for plain-language descriptions
     """
-    s = tier_dist.get("s_pct", 0)
-    c = tier_dist.get("c_pct", 0)
+    if key_metric_context is None:
+        key_metric_context = {}
 
-    if s >= 30:
-        base = f"이 섹터는 S티어 기업이 {s:.0f}%에 달하는 강한 섹터입니다."
+    s   = tier_dist.get("s_pct", 0)
+    a   = tier_dist.get("a_pct", 0)
+    b   = tier_dist.get("b_pct", 0)
+    c   = tier_dist.get("c_pct", 0)
+
+    # ── 문장 1: 섹터 특성 ────────────────────────────────────────────────────
+    if narrative:
+        sent1 = narrative
+    elif s >= 30:
+        sent1 = f"이 섹터는 S티어 기업이 {s:.0f}%에 달하는 강한 섹터입니다."
     elif c >= 30:
-        base = f"이 섹터는 C티어 기업이 {c:.0f}%로 상당수 포함되어 있어 선별적 접근이 필요합니다."
+        sent1 = f"이 섹터는 C티어 기업이 {c:.0f}%로 상당수 포함되어 있어 선별적 접근이 필요합니다."
     else:
-        base = "이 섹터는 A·B티어 중심의 균형 잡힌 구성을 보입니다."
+        sent1 = "이 섹터는 A·B티어 중심의 균형 잡힌 구성을 보입니다."
 
-    if avg_value is not None:
-        stat_ko = STAT_LABEL_KO.get(key_stat, key_stat)
-        base += f" 섹터 평균 {stat_ko}은 {avg_value:.1f}%입니다."
+    # ── 문장 2: 핵심 지표 설명 + 현재 수치 ──────────────────────────────────
+    context_str = key_metric_context.get(key_stat, "")
+    unit = _METRIC_UNIT.get(key_stat, "")
+    label = _METRIC_LABEL.get(key_stat, key_stat)
 
-    base += " 종목별 상세는 [종목 비교] 탭에서 확인하세요."
-    return base
+    if context_str and avg_value is not None:
+        sent2 = f"{context_str} 현재 섹터 평균은 {avg_value:.1f}{unit}입니다."
+    elif context_str:
+        sent2 = context_str
+    elif avg_value is not None:
+        sent2 = f"섹터 평균 {label}은 {avg_value:.1f}{unit}입니다."
+    else:
+        sent2 = ""
+
+    # ── 문장 3: 티어 분포 맥락 ───────────────────────────────────────────────
+    if s + a >= 50:
+        sent3 = "우량 기업(S·A티어)이 절반 이상으로 종목 선택 범위가 비교적 넓습니다."
+    elif c >= 40:
+        sent3 = "종목 간 실적 편차가 크므로 개별 종목 비교 분석이 특히 중요합니다."
+    elif b >= 40:
+        sent3 = "중간 수준의 안정적 기업이 주를 이루어 방어적 성격이 강합니다."
+    else:
+        sent3 = "S~C티어가 고르게 분포해 다양한 투자 목적에 맞는 종목을 찾을 수 있습니다."
+
+    parts = [sent1, sent2, sent3, "종목별 상세는 [종목 비교] 탭에서 확인하세요."]
+    return " ".join(p for p in parts if p)
 
 
 # ── §7.2 기업 인사이트 (강점/약점) ────────────────────────────────────────────

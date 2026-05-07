@@ -122,10 +122,13 @@ def get_sector(sector_name: str):
         avg_val = _r(avg_row[col]) if col and avg_row[col] is not None else None
         key_ind_details.append({"indicator": ki, "sector_avg": avg_val, "source": source_label})
 
+    sec_def = _DEFS.get(sector_name, {})
     auto_insight = sector_insight(
         tier_dist,
         key_indicators[0] if key_indicators else "opm",
         key_ind_details[0]["sector_avg"] if key_ind_details else None,
+        narrative=sec_def.get("narrative", ""),
+        key_metric_context=sec_def.get("key_metric_context", {}),
     )
 
     # 전체 섹터 common_score 순위 기반 overall_tier (sectors.py와 동일 로직)
