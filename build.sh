@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export UV_LINK_MODE=copy
+
 echo "=== [1/5] Python 가상환경 생성 (Python 3.12) ==="
 uv venv .venv --python 3.12
 
